@@ -10,15 +10,17 @@ export async function createUserAccount(user: INewUser) {
       user.password,
       user.name
     );
+
     if (!newAccount) throw Error;
 
     const avatarUrl = avatars.getInitials(user.name);
+
     const newUser = await saveUserToDB({
       accountId: newAccount.$id,
       name: newAccount.name,
       email: newAccount.email,
       username: user.username,
-      imageUrl: avatarUrl.toString(),
+      imageUrl: new URL(avatarUrl.toString()).toString(),
     });
     return newUser;
   } catch (error) {
@@ -26,6 +28,7 @@ export async function createUserAccount(user: INewUser) {
     return error;
   }
 }
+
 
 export async function saveUserToDB(user: {
   accountId: string;
@@ -242,46 +245,37 @@ export async function getPostById(postId: string) {
 }
 
 export async function updatePost(post: IUpdatePost) {
-  const hasFileToUpdate = post.file.length > 0;
   try {
-    let image = {
-      imageUrl: post.imageUrl,
-      imageId: post.imageId,
-    };
-    if (hasFileToUpdate) {
-      //upload image to storage
-      const uploadedFile = await uploadFile(post.file[0]);
+    // Upload new file if exists
+    let uploadedFile;
+    if (post.file.length > 0) {
+      uploadedFile = await uploadFile(post.file[0]);
       if (!uploadedFile) throw Error;
-
-      //Get file url
-      const fileUrl = getFilePreview(uploadedFile.$id);
-      if (!fileUrl) {
-        deleteFile(uploadedFile.$id);
-        throw Error;
-      }
-      image = { ...image, imageUrl: fileUrl, imageId: uploadedFile.$id };
     }
 
-    //convert tags into an array
-    const tags = post.tags?.replace(/ /g, "").split(",") || [];
+    // Get file url
+    const fileUrl = uploadedFile
+      ? new URL(getFilePreview(uploadedFile.$id)).toString()
+      : post.imageUrl;
 
-    //save post to database
     const updatedPost = await databases.updateDocument(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
       post.postId,
       {
         caption: post.caption,
-        imageUrl: image.imageUrl,
-        imageId: image.imageId,
+        imageUrl: fileUrl,
+        imageId: uploadedFile ? uploadedFile.$id : post.imageId,
         location: post.location,
-        tags: tags,
+        tags: post.tags,
       }
     );
+
     if (!updatedPost) {
-      await deleteFile(post.imageId);
+      await deleteFile(uploadedFile.$id);
       throw Error;
     }
+
     return updatedPost;
   } catch (error) {
     console.log(error);

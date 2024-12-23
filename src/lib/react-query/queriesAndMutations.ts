@@ -4,27 +4,25 @@ import {
   useMutation,
   useQueryClient,
   useInfiniteQuery,
-  Mutation,
-  QueryClient,
-} from "@tanstack/react-query";
+} from '@tanstack/react-query';
 import {
-  createPost,
   createUserAccount,
-  deletePost,
-  DeleteSavedPost,
-  getCurrentUser,
-  getInfinitePosts,
-  getPostById,
+  createPost,
   getRecentPosts,
   likePost,
   savePost,
-  searchPosts,
+  DeleteSavedPost,
   signInAccount,
   signOutAccount,
+  getPostById,
   updatePost,
-} from "../appwrite/api";
-import { INewPost, INewUser, IUpdatePost } from "../../types";
-import { QUERY_KEYS } from "./queryKeys";
+  deletePost,
+  getInfinitePosts,
+  searchPosts,
+  getCurrentUser,
+} from '../appwrite/api';
+import { QUERY_KEYS } from './queryKeys';
+import { INewUser, INewPost, IUpdatePost } from '../../types';
 
 export const useCreateUserAccount = () => {
   return useMutation({
@@ -34,8 +32,7 @@ export const useCreateUserAccount = () => {
 
 export const useSignInAccount = () => {
   return useMutation({
-    mutationFn: (user: { email: string; password: string }) =>
-      signInAccount(user),
+    mutationFn: (user: { email: string; password: string }) => signInAccount(user),
   });
 };
 
@@ -74,11 +71,12 @@ export const useLikePost = () => {
       postId: string;
       likesArray: string[];
     }) => {
-      return await likePost(postId, likesArray);
+      const result = await likePost(postId, likesArray);
+      return { $id: result?.$id || '' };
     },
-    onSuccess: (data: { $id: string }) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_POST_BY_ID, data?.$id],
+        queryKey: [QUERY_KEYS.GET_POST_BY_ID, data.$id],
       });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
@@ -96,9 +94,8 @@ export const useLikePost = () => {
 export const useSavePost = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ postId, userId }: { postId: string; userId: string }) => {
-      return await savePost(postId, userId);
-    },
+    mutationFn: ({ postId, userId }: { postId: string; userId: string }) => 
+      savePost(postId, userId),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
@@ -112,14 +109,11 @@ export const useSavePost = () => {
     },
   });
 };
-
 
 export const useDeleteSavedPost = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (savedRecordId: string) => {
-      return await DeleteSavedPost(savedRecordId);
-    },
+    mutationFn: (savedRecordId: string) => DeleteSavedPost(savedRecordId),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
@@ -133,7 +127,6 @@ export const useDeleteSavedPost = () => {
     },
   });
 };
-
 
 export const useGetCurrentUser = () => {
   return useQuery({
@@ -167,7 +160,7 @@ export const useDeletePost = () => {
   return useMutation({
     mutationFn: ({ postId, imageId }: { postId: string; imageId: string }) =>
       deletePost(postId, imageId),
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
       });
@@ -191,7 +184,7 @@ export const useGetPosts = () => {
 
 export const useSearchPosts = (searchTerm: string) => {
   return useQuery({
-    queryKey: [QUERY_KEYS.SEARCH_POSTS,searchTerm],
+    queryKey: [QUERY_KEYS.SEARCH_POSTS, searchTerm],
     queryFn: () => searchPosts(searchTerm),
     enabled: !!searchTerm,
   });
