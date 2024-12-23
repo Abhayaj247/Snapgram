@@ -28,7 +28,7 @@ Snapgram is a modern social media application built with cutting-edge web techno
 ### Setup
 1. Clone the repository
 \`\`\`bash
-git clone https://github.com/YOUR_USERNAME/snapgram.git
+git clone https://github.com/Abhayaj247/Snapgram.git
 cd snapgram
 \`\`\`
 
@@ -68,7 +68,7 @@ Distributed under the MIT License.
 ## 📧 Contact
 Your Name - your.email@example.com
 
-Project Link: [https://github.com/YOUR_USERNAME/snapgram](https://github.com/YOUR_USERNAME/snapgram)" > README.md
+Project Link: [https://github.com/Abhayaj247/Snapgram](https://github.com/YOUR_USERNAME/snapgram)" > README.md
 
 # Stage the README.md file
 git add README.md
