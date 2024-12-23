@@ -1,3 +1,4 @@
+import { Models } from 'appwrite';
 import {
   useQuery,
   useMutation,
@@ -66,14 +67,14 @@ export const useGetRecentPosts = () => {
 export const useLikePost = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       postId,
       likesArray,
     }: {
       postId: string;
       likesArray: string[];
     }) => {
-      likePost(postId, likesArray);
+      return await likePost(postId, likesArray);
     },
     onSuccess: (data: { $id: string }) => {
       queryClient.invalidateQueries({
@@ -95,8 +96,8 @@ export const useLikePost = () => {
 export const useSavePost = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ postId, userId }: { postId: string; userId: string }) => {
-      savePost(postId, userId);
+    mutationFn: async ({ postId, userId }: { postId: string; userId: string }) => {
+      return await savePost(postId, userId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -112,11 +113,12 @@ export const useSavePost = () => {
   });
 };
 
+
 export const useDeleteSavedPost = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (savedRecordId: string) => {
-      DeleteSavedPost(savedRecordId);
+    mutationFn: async (savedRecordId: string) => {
+      return await DeleteSavedPost(savedRecordId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -131,6 +133,7 @@ export const useDeleteSavedPost = () => {
     },
   });
 };
+
 
 export const useGetCurrentUser = () => {
   return useQuery({
@@ -178,7 +181,7 @@ export const useGetPosts = () => {
     initialPageParam: 0,
     queryFn: ({ pageParam = 0 }: { pageParam?: number }) => 
       getInfinitePosts({ pageParam }),
-    getNextPageParam: (lastPage: DocumentList<Document> | undefined) => {
+    getNextPageParam: (lastPage: Models.DocumentList<Models.Document> | undefined) => {
       if (!lastPage || lastPage.documents.length === 0) return null;
 
       return lastPage.documents.length > 0 ? lastPage.documents.length : null;
