@@ -66,7 +66,7 @@ snapgram/
 Distributed under the MIT License.
 
 ## 📧 Contact
-Your Name - your.email@example.com
+Your Name - abhayjoshi2830@gmail.com
 
 Project Link: [https://github.com/Abhayaj247/Snapgram](https://github.com/YOUR_USERNAME/snapgram)" > README.md
 
