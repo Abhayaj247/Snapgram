@@ -68,7 +68,7 @@ Distributed under the MIT License.
 ## 📧 Contact
 Your Name - abhayjoshi2830@gmail.com
 
-Project Link: [https://github.com/Abhayaj247/Snapgram](https://github.com/YOUR_USERNAME/snapgram)" > README.md
+Project Link: [https://github.com/Abhayaj247/Snapgram]" > README.md
 
 # Stage the README.md file
 git add README.md
